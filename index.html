@@ -200,12 +200,22 @@
                 display: none;
             }
         }
+
+        /* Toggle Button - Hidden */
+        .toggle-btn {
+            display: none;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center">
     
     <!-- Fireworks Canvas -->
     <canvas id="fireworksCanvas"></canvas>
+
+    <!-- Toggle Button -->
+    <button id="toggleBtn" class="toggle-btn" onclick="toggleMode()">
+        🧪 Test Mode (10s)
+    </button>
 
     <!-- Main Container -->
     <div class="container mx-auto px-4 py-8 relative z-20">
@@ -222,43 +232,33 @@
             </h1>
             
             <!-- Countdown Timer -->
-            <div class="flex justify-center items-center gap-4 md:gap-8 mb-8">
-                <!-- Days -->
-                <div class="flex flex-col items-center">
-                    <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl p-4 md:p-8 shadow-2xl min-w-[80px] md:min-w-[120px]">
-                        <span id="days" class="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 glow">00</span>
-                    </div>
-                    <span class="text-yellow-200 text-sm md:text-lg font-semibold mt-3 uppercase tracking-wider">Days</span>
-                </div>
-
-                <span class="text-yellow-400 text-4xl md:text-6xl font-bold">:</span>
-
+            <div class="flex justify-center items-center gap-6 md:gap-12 mb-8">
                 <!-- Hours -->
                 <div class="flex flex-col items-center">
-                    <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl p-4 md:p-8 shadow-2xl min-w-[80px] md:min-w-[120px]">
-                        <span id="hours" class="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 glow">00</span>
+                    <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl p-6 md:p-12 shadow-2xl min-w-[120px] md:min-w-[180px]">
+                        <span id="hours" class="text-6xl md:text-8xl lg:text-9xl font-bold text-gray-900 glow">00</span>
                     </div>
-                    <span class="text-yellow-200 text-sm md:text-lg font-semibold mt-3 uppercase tracking-wider">Hours</span>
+                    <span class="text-yellow-200 text-xl md:text-3xl font-semibold mt-4 uppercase tracking-wider">Hours</span>
                 </div>
 
-                <span class="text-yellow-400 text-4xl md:text-6xl font-bold">:</span>
+                <span class="text-yellow-400 text-6xl md:text-8xl font-bold">:</span>
 
                 <!-- Minutes -->
                 <div class="flex flex-col items-center">
-                    <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl p-4 md:p-8 shadow-2xl min-w-[80px] md:min-w-[120px]">
-                        <span id="minutes" class="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 glow">00</span>
+                    <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl p-6 md:p-12 shadow-2xl min-w-[120px] md:min-w-[180px]">
+                        <span id="minutes" class="text-6xl md:text-8xl lg:text-9xl font-bold text-gray-900 glow">00</span>
                     </div>
-                    <span class="text-yellow-200 text-sm md:text-lg font-semibold mt-3 uppercase tracking-wider">Minutes</span>
+                    <span class="text-yellow-200 text-xl md:text-3xl font-semibold mt-4 uppercase tracking-wider">Minutes</span>
                 </div>
 
-                <span class="text-yellow-400 text-4xl md:text-6xl font-bold">:</span>
+                <span class="text-yellow-400 text-6xl md:text-8xl font-bold">:</span>
 
                 <!-- Seconds -->
                 <div class="flex flex-col items-center">
-                    <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl p-4 md:p-8 shadow-2xl min-w-[80px] md:min-w-[120px]">
-                        <span id="seconds" class="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 glow">00</span>
+                    <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl p-6 md:p-12 shadow-2xl min-w-[120px] md:min-w-[180px]">
+                        <span id="seconds" class="text-6xl md:text-8xl lg:text-9xl font-bold text-gray-900 glow">00</span>
                     </div>
-                    <span class="text-yellow-200 text-sm md:text-lg font-semibold mt-3 uppercase tracking-wider">Seconds</span>
+                    <span class="text-yellow-200 text-xl md:text-3xl font-semibold mt-4 uppercase tracking-wider">Seconds</span>
                 </div>
             </div>
 
@@ -291,17 +291,47 @@
         // ============================================
         // CONFIGURATION - Easy to change
         // ============================================
-        const TARGET_DATE = new Date('January 1, 2026 00:00:00').getTime();
-        
-        // For testing: Uncomment the line below to set countdown to 10 seconds from now
-        // const TARGET_DATE = new Date().getTime() + (10 * 1000);
+        let isTestMode = localStorage.getItem('testMode') === 'true';
+        let TARGET_DATE;
+        let countdownInterval;
+
+        // Set target date based on mode
+        if (isTestMode) {
+            TARGET_DATE = new Date().getTime() + (10 * 1000);
+        } else {
+            TARGET_DATE = new Date('January 1, 2026 00:00:00').getTime();
+        }
+
+        // Update button on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggleBtn');
+            if (isTestMode) {
+                toggleBtn.textContent = '📅 Real Date';
+                toggleBtn.classList.add('test-mode');
+            } else {
+                toggleBtn.textContent = '🧪 Test Mode (10s)';
+                toggleBtn.classList.remove('test-mode');
+            }
+        });
+
+        // ============================================
+        // TOGGLE MODE FUNCTION
+        // ============================================
+        function toggleMode() {
+            isTestMode = !isTestMode;
+            
+            // Save mode to localStorage
+            localStorage.setItem('testMode', isTestMode);
+            
+            // Reload the page to restart countdown
+            location.reload();
+        }
 
         // ============================================
         // COUNTDOWN LOGIC
         // ============================================
         const countdownSection = document.getElementById('countdownSection');
         const celebrationSection = document.getElementById('celebrationSection');
-        const daysEl = document.getElementById('days');
         const hoursEl = document.getElementById('hours');
         const minutesEl = document.getElementById('minutes');
         const secondsEl = document.getElementById('seconds');
@@ -317,21 +347,20 @@
                 return;
             }
 
-            // Calculate time units
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            // Calculate time units (only hours, minutes, seconds)
+            const totalSeconds = Math.floor(distance / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
 
             // Update display with leading zeros
-            daysEl.textContent = String(days).padStart(2, '0');
             hoursEl.textContent = String(hours).padStart(2, '0');
             minutesEl.textContent = String(minutes).padStart(2, '0');
             secondsEl.textContent = String(seconds).padStart(2, '0');
         }
 
         // Start countdown
-        const countdownInterval = setInterval(updateCountdown, 1000);
+        countdownInterval = setInterval(updateCountdown, 1000);
         updateCountdown(); // Initial call
 
         // ============================================
@@ -484,18 +513,6 @@
             }
             animateFireworks();
         }
-
-        // ============================================
-        // OPTIONAL: Restart button for testing
-        // ============================================
-        // Uncomment below to add a restart button
-        /*
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'r' || e.key === 'R') {
-                location.reload();
-            }
-        });
-        */
     </script>
 
 </body>
